@@ -1,0 +1,8 @@
+# credentials
+api-key
+credentials.json
+token.json
+
+# env
+.env*
+
