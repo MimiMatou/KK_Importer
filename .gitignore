@@ -1,6 +1,6 @@
 # credentials
 api-key
-credentials.json
+*credentials.json
 token.json
 
 # env

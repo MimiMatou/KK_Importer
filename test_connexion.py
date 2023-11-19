@@ -5,6 +5,8 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import gspread
+
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
@@ -44,10 +46,10 @@ def main():
     sheet = service.spreadsheets()
     result = (
         sheet.values()
-        .get(spreadsheetId=SAMPLE_SPREADSHEET_ID, range=SAMPLE_RANGE_NAME)
+        .get(spreadsheetId=SAMPLE_SPREADSHEET_ID)
         .execute()
     )
-    values = result.get("values", [])
+    """ values = result.get("values", [])
 
     if not values:
       print("No data found.")
@@ -56,7 +58,10 @@ def main():
     print("Name, Major:")
     for row in values:
       # Print columns A and E, which correspond to indices 0 and 4.
-      print(f"{row[0]}, {row[4]}")
+      print(f"{row[0]}, {row[4]}") """
+    
+    print(result.sheets("WORSHIPERS").range("C2").values)
+
   except HttpError as err:
     print(err)
 
