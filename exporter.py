@@ -22,12 +22,20 @@ TEMPLATE_HEADER_WORSHIPERS = {
     "Worship" : "XWORSHIPX",
     "Effect" : "XEFFECTX"
 }
+TEMPLATE_HEADER_EVENTS = {
+    "Name" : "XNAMEX",
+    "Illustrator" : "XILLUSTRATORX",
+    "Faction" : "XFACTIONX",
+    "Cost" : "XCOSTX",
+    "Effect" : "XEFFECTX",
+    "Burst" : "XELEMVALUEX",
+}
 TEMPLATE_DEFAULT = {
     "XEXTENSIONX" : "Core Set",
     "XILLUSTRATORX" : "\"\"",
     "XFACTIONX" : "Neutral",
     "XCOSTX" : "0",
-    "XEXALTEDX" : "False",
+    "XEXALTEDX" : "false",
     "XTYPESX" : "{\"\"}",
     "XATTACKX" : "0",
     "XENDURANCEX" : "0",
@@ -65,16 +73,14 @@ def main():
         "--================--\n"
        )
     
-    # WORSHIPERS
+    #==== WORSHIPERS ====
     # Get the sheets
     worshipers = sh.worksheet("WORSHIPERS").get_all_values()
     export_tts.write("-- = WORSHIPERS = --\n")
-
     # Filter by faction
     for faction in FACTIONS_LIST:
         export_tts.write("-- "+ faction + "\n")
         wsh_filtered = []
-        col_name = getColNumber(worshipers,"Name")
         col_faction = getColNumber(worshipers,"Faction")
         for i in worshipers:
             if i[col_faction] == faction:
@@ -95,13 +101,45 @@ def main():
             line_to_write = finishDefaultTemplate(line_to_write)
             export_tts.write(line_to_write+"\n")
 
-    # Result
-    #print (getTypesAsDict(getValueByColIntoList(worshipers,"Types",wsh_filtered[0])))
+    #==== EVENTS ====
+    # Get the sheets
+    events = sh.worksheet("EVENTS").get_all_values()
+    export_tts.write("-- = EVENTS = --\n")
+    # Filter by faction
+    for faction in FACTIONS_LIST:
+        export_tts.write("-- "+ faction + "\n")
+        evt_filtered = []
+        col_faction = getColNumber(events,"Faction")
+        for i in events:
+            if i[col_faction] == faction:
+                evt_filtered.append(i)
+        for evt in evt_filtered:
+            # Create the line
+            line_to_write = CARD_TEMPLATE
+            # Name
+            line_to_write = line_to_write.replace("XCARDX","Event")
+            # Automatic replaces
+            for k,v in TEMPLATE_HEADER_EVENTS.items():
+                line_to_write = replaceTemplate(events,line_to_write,evt,k,v)
+            # Types
+            line_to_write = line_to_write.replace("XTYPESX",getTypesAsDict(getValueByColIntoList(events,"Types",evt)))
+            # Traits
+            line_to_write = line_to_write.replace("XELEMICONSX",getElemsAsDict(getValueByColIntoList(events,"Elements",evt)))
+            # Finish line
+            line_to_write = finishDefaultTemplate(line_to_write)
+            export_tts.write(line_to_write+"\n")
 
     # Write the end of the file
     export_tts.write("}")
     export_tts.close()
 
+def getElemsAsDict(elems_as_string):
+    elem_dict = "{"
+    types_table = elems_as_string.split("/")
+    for t in types_table:
+        elem_dict = elem_dict + "\"" + t.strip() + "\","
+    elem_dict = elem_dict[:-1]+"}"
+    return elem_dict
 
 def getTraitsAsDict(sheet_as_table,line_as_list):
     traits_dict = "{"
