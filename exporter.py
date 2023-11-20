@@ -30,6 +30,17 @@ TEMPLATE_HEADER_EVENTS = {
     "Effect" : "XEFFECTX",
     "Burst" : "XELEMVALUEX",
 }
+TEMPLATE_HEADER_EQUIPMENTS = {
+    "Name" : "XNAMEX",
+    "Illustrator" : "XILLUSTRATORX",
+    "Faction" : "XFACTIONX",
+    "Cost" : "XCOSTX",
+    "Bonus Attack Power" : "XATTACKX",
+    "Bonus Endurance" : "XENDURANCEX",
+    "Exalted" : "XEXALTEDX",
+    "Effect" : "XEFFECTX",
+    "Burst" : "XELEMVALUEX",
+}
 TEMPLATE_DEFAULT = {
     "XEXTENSIONX" : "Core Set",
     "XILLUSTRATORX" : "\"\"",
@@ -73,6 +84,36 @@ def main():
         "--================--\n"
        )
     
+    #==== EQUIPMENTS ====
+    # Get the sheets
+    equipments = sh.worksheet("EQUIPMENTS").get_all_values()
+    export_tts.write("--\n")
+    export_tts.write("-- = EQUIPMENTS = --\n")
+    # Filter by faction
+    for faction in FACTIONS_LIST:
+        export_tts.write("-- "+ faction + "\n")
+        equ_filtered = []
+        col_faction = getColNumber(equipments,"Faction")
+        for i in equipments:
+            if i[col_faction] == faction:
+                equ_filtered.append(i)
+        for equ in equ_filtered:
+            # Create the line
+            line_to_write = CARD_TEMPLATE
+            # Name
+            line_to_write = line_to_write.replace("XCARDX","Equipment")
+            # Automatic replaces
+            for k,v in TEMPLATE_HEADER_EQUIPMENTS.items():
+                line_to_write = replaceTemplate(equipments,line_to_write,equ,k,v)
+            # Types
+            line_to_write = line_to_write.replace("XTYPESX",getTypesAsDict(getValueByColIntoList(equipments,"Types",equ)))
+            # Elements
+            line_to_write = line_to_write.replace("XELEMICONSX",getElemsAsDict(getValueByColIntoList(equipments,"Elements",equ)))
+            # Finish line
+            line_to_write = finishDefaultTemplate(line_to_write)
+            export_tts.write(line_to_write+"\n")
+    export_tts.write("--\n")
+
     #==== WORSHIPERS ====
     # Get the sheets
     worshipers = sh.worksheet("WORSHIPERS").get_all_values()
@@ -100,6 +141,7 @@ def main():
             # Finish line
             line_to_write = finishDefaultTemplate(line_to_write)
             export_tts.write(line_to_write+"\n")
+    export_tts.write("--\n")
 
     #==== EVENTS ====
     # Get the sheets
@@ -123,11 +165,12 @@ def main():
                 line_to_write = replaceTemplate(events,line_to_write,evt,k,v)
             # Types
             line_to_write = line_to_write.replace("XTYPESX",getTypesAsDict(getValueByColIntoList(events,"Types",evt)))
-            # Traits
+            # Elements
             line_to_write = line_to_write.replace("XELEMICONSX",getElemsAsDict(getValueByColIntoList(events,"Elements",evt)))
             # Finish line
             line_to_write = finishDefaultTemplate(line_to_write)
             export_tts.write(line_to_write+"\n")
+    export_tts.write("--\n")
 
     # Write the end of the file
     export_tts.write("}")
