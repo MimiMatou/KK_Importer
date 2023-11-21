@@ -8,7 +8,7 @@ OUTPUT_FILE_NAME = "output.txt"
 # Factions list
 FACTIONS_LIST = ["Neutral","Aïma","Djaïn","Gaalden","Meli-Akumi"]
 # Card template
-CARD_TEMPLATE = "[\"XNAMEX\"]={Card=\"XCARDX\",Extension=\"XEXTENSIONX\",Illustrator=\"XILLUSTRATORX\",Faction=\"XFACTIONX\",Cost=XCOSTX,Exalted=XEXALTEDX,Types=XTYPESX,AttackPower=XATTACKX,Endurance=XENDURANCEX,Worship=XWORSHIPX,Traits=XTRAITSX,Effect=\"XEFFECTX\",Adoration=XADORATIONX,Swiftness=XSWIFTNESSX,Runes=XRUNESX,ElementalValue=XELEMVALUEX,ElementalIcons=XELEMICONSX,Locations=XLOCATIONSX},"
+CARD_TEMPLATE = "[\"XNAMEX\"]={Card=\"XCARDX\",Extension=\"XEXTENSIONX\",Illustrator=\"XILLUSTRATORX\",Faction=\"XFACTIONX\",Cost=XCOSTX,Exalted=XEXALTEDX,Types=XTYPESX,AttackPower=XATTACKX,Endurance=XENDURANCEX,Worship=XWORSHIPX,Traits=XTRAITSX,Effect=\"XEFFECTX\",Adoration=XADORATIONX,Swiftness=XSWIFTNESSX,Runes=\"XRUNESX\",ElementalValue=XELEMVALUEX,ElementalIcons=XELEMICONSX,Locations=XLOCATIONSX},"
 TYPES_TEMPLATE = "{\"Shadow\",\"Schemer\"}"
 TRAITS_TEMPLATE = "{\"Reach\"}"
 TEMPLATE_HEADER_WORSHIPERS = {
@@ -28,7 +28,7 @@ TEMPLATE_HEADER_EVENTS = {
     "Faction" : "XFACTIONX",
     "Cost" : "XCOSTX",
     "Effect" : "XEFFECTX",
-    "Burst" : "XELEMVALUEX",
+    "Burst" : "XELEMVALUEX"
 }
 TEMPLATE_HEADER_EQUIPMENTS = {
     "Name" : "XNAMEX",
@@ -39,7 +39,22 @@ TEMPLATE_HEADER_EQUIPMENTS = {
     "Bonus Endurance" : "XENDURANCEX",
     "Exalted" : "XEXALTEDX",
     "Effect" : "XEFFECTX",
-    "Burst" : "XELEMVALUEX",
+    "Burst" : "XELEMVALUEX"
+}
+TEMPLATE_HEADER_KKACTIONS = {
+    "Name" : "XNAMEX",
+    "Illustrator" : "XILLUSTRATORX",
+    "Swiftness" : "XSWIFTNESSX",
+    "Runes" : "XRUNESX",
+    "Adoration" : "XADORATIONX",
+    "Effect" : "XEFFECTX"
+}
+TEMPLATE_HEADER_ALTARS = {
+    "Name" : "XNAMEX",
+    "Illustrator" : "XILLUSTRATORX",
+    "Cost" : "XCOSTX",
+    "Exalted" : "XEXALTEDX",
+    "Effect" : "XEFFECTX"
 }
 TEMPLATE_DEFAULT = {
     "XEXTENSIONX" : "Core Set",
@@ -55,7 +70,7 @@ TEMPLATE_DEFAULT = {
     "XEFFECTX" : "",
     "XADORATIONX" : "0",
     "XSWIFTNESSX" : "0",
-    "XRUNESX" : "{\"\"}",
+    "XRUNESX" : "\"\"",
     "XELEMVALUEX" : "0",
     "XELEMICONSX" : "{\"\"}",
     "XLOCATIONSX" : "{\"\"}"
@@ -109,6 +124,56 @@ def main():
             line_to_write = line_to_write.replace("XTYPESX",getTypesAsDict(getValueByColIntoList(equipments,"Types",equ)))
             # Elements
             line_to_write = line_to_write.replace("XELEMICONSX",getElemsAsDict(getValueByColIntoList(equipments,"Elements",equ)))
+            # Finish line
+            line_to_write = finishDefaultTemplate(line_to_write)
+            export_tts.write(line_to_write+"\n")
+    export_tts.write("--\n")
+    
+    #==== ALTARS ====
+    # Get the sheets
+    altars = sh.worksheet("ALTARS").get_all_values()
+    export_tts.write("--\n")
+    export_tts.write("-- = ALTARS = --\n")
+    # Filter by faction
+    for faction in FACTIONS_LIST:
+        export_tts.write("-- "+ faction + "\n")
+        alt_filtered = []
+        col_faction = getColNumber(altars,"Faction")
+        for i in altars:
+            if i[col_faction] == faction:
+                alt_filtered.append(i)
+        for alt in alt_filtered:
+            # Create the line
+            line_to_write = CARD_TEMPLATE
+            # Name
+            line_to_write = line_to_write.replace("XCARDX","Altar")
+            # Automatic replaces
+            for k,v in TEMPLATE_HEADER_ALTARS.items():
+                line_to_write = replaceTemplate(altars,line_to_write,alt,k,v)
+            # Types
+            line_to_write = line_to_write.replace("XTYPESX","\""+getValueByColIntoList(altars,"Types",alt)+"\"")
+            # Locations
+            line_to_write = line_to_write.replace("XLOCATIONSX",getElemsAsDict(getValueByColIntoList(altars,"Locations",alt)))
+            # Finish line
+            line_to_write = finishDefaultTemplate(line_to_write)
+            export_tts.write(line_to_write+"\n")
+    export_tts.write("--\n")
+
+    #==== KKOLOSSAL ACTIONS ====
+    # Get the sheets
+    kkactions = sh.worksheet("KKOLOSSAL ACTIONS").get_all_values()
+    export_tts.write("--\n")
+    export_tts.write("-- = KKOLOSSAL ACTIONS = --\n")
+    # Filter by faction
+    for kka in kkactions:
+        if getValueByColIntoList(kkactions,"Name",kka) != "Name":
+            # Create the line
+            line_to_write = CARD_TEMPLATE
+            # Name
+            line_to_write = line_to_write.replace("XCARDX","KKolossal Actions")
+            # Automatic replaces
+            for k,v in TEMPLATE_HEADER_KKACTIONS.items():
+                line_to_write = replaceTemplate(kkactions,line_to_write,kka,k,v)
             # Finish line
             line_to_write = finishDefaultTemplate(line_to_write)
             export_tts.write(line_to_write+"\n")
