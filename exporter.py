@@ -64,7 +64,7 @@ TEMPLATE_HEADER_TRIBES = {
 }
 TEMPLATE_DEFAULT = {
     "XEXTENSIONX" : "Core Set",
-    "XILLUSTRATORX" : "\"\"",
+    "XILLUSTRATORX" : "",
     "XFACTIONX" : "Neutral",
     "XCOSTX" : "0",
     "XEXALTEDX" : "false",
@@ -76,7 +76,7 @@ TEMPLATE_DEFAULT = {
     "XEFFECTX" : "",
     "XADORATIONX" : "0",
     "XSWIFTNESSX" : "0",
-    "XRUNESX" : "\"\"",
+    "XRUNESX" : "",
     "XELEMVALUEX" : "0",
     "XELEMICONSX" : "{\"\"}",
     "XLOCATIONSX" : "{\"\"}"
@@ -314,7 +314,7 @@ def finishDefaultTemplate(line_to_write):
     return finished_line
 
 def replaceTemplate(sheet_as_table,line_to_write,line_as_list,col_name,template_in_the_line):
-    return line_to_write.replace(template_in_the_line,getValueByColIntoList(sheet_as_table,col_name,line_as_list).replace("\n","&#x0d;"))
+    return line_to_write.replace(template_in_the_line,getValueByColIntoList(sheet_as_table,col_name,line_as_list).replace("\n","&#x0d;").replace("\"","\\\"").replace("*","X"))
 
 def getValueByColIntoList(sheet_as_table,col_name,line_as_list):
     return line_as_list[getColNumber(sheet_as_table,col_name)]
