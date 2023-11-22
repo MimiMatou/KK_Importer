@@ -56,6 +56,12 @@ TEMPLATE_HEADER_ALTARS = {
     "Exalted" : "XEXALTEDX",
     "Effect" : "XEFFECTX"
 }
+TEMPLATE_HEADER_TRIBES = {
+    "Name" : "XNAMEX",
+    "Illustrator" : "XILLUSTRATORX",
+    "Faction" : "XFACTIONX",
+    "Effect" : "XEFFECTX"
+}
 TEMPLATE_DEFAULT = {
     "XEXTENSIONX" : "Core Set",
     "XILLUSTRATORX" : "\"\"",
@@ -99,6 +105,34 @@ def main():
         "--================--\n"
        )
     
+    #==== TRIBES ====
+    # Get the sheets
+    tribes = sh.worksheet("TRIBES").get_all_values()
+    export_tts.write("--\n")
+    export_tts.write("-- = TRIBES = --\n")
+    # Filter by faction
+    for faction in FACTIONS_LIST:
+        export_tts.write("-- "+ faction + "\n")
+        trb_filtered = []
+        col_faction = getColNumber(tribes,"Faction")
+        for i in tribes:
+            if i[col_faction] == faction:
+                trb_filtered.append(i)
+        for trb in trb_filtered:
+            # Create the line
+            line_to_write = CARD_TEMPLATE
+            # Name
+            line_to_write = line_to_write.replace("XCARDX","Tribe")
+            # Automatic replaces
+            for k,v in TEMPLATE_HEADER_TRIBES.items():
+                line_to_write = replaceTemplate(tribes,line_to_write,trb,k,v)
+            # Elements
+            line_to_write = line_to_write.replace("XELEMICONSX",getElemsAsDict(getValueByColIntoList(tribes,"Elements",trb)))
+            # Finish line
+            line_to_write = finishDefaultTemplate(line_to_write)
+            export_tts.write(line_to_write+"\n")
+    export_tts.write("--\n")
+
     #==== EQUIPMENTS ====
     # Get the sheets
     equipments = sh.worksheet("EQUIPMENTS").get_all_values()
