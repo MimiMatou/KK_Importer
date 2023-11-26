@@ -204,7 +204,7 @@ def main():
             # Create the line
             line_to_write = CARD_TEMPLATE
             # Name
-            line_to_write = line_to_write.replace("XCARDX","KKolossal Actions")
+            line_to_write = line_to_write.replace("XCARDX","KKolossal Action")
             # Automatic replaces
             for k,v in TEMPLATE_HEADER_KKACTIONS.items():
                 line_to_write = replaceTemplate(kkactions,line_to_write,kka,k,v)
