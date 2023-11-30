@@ -52,6 +52,7 @@ TEMPLATE_HEADER_KKACTIONS = {
 TEMPLATE_HEADER_ALTARS = {
     "Name" : "XNAMEX",
     "Illustrator" : "XILLUSTRATORX",
+    "Faction" : "XFACTIONX",
     "Cost" : "XCOSTX",
     "Exalted" : "XEXALTEDX",
     "Effect" : "XEFFECTX"
@@ -185,7 +186,7 @@ def main():
             for k,v in TEMPLATE_HEADER_ALTARS.items():
                 line_to_write = replaceTemplate(altars,line_to_write,alt,k,v)
             # Types
-            line_to_write = line_to_write.replace("XTYPESX","\""+getValueByColIntoList(altars,"Types",alt)+"\"")
+            line_to_write = line_to_write.replace("XTYPESX",getTypesAsDict(getValueByColIntoList(altars,"Types",alt)))
             # Locations
             line_to_write = line_to_write.replace("XLOCATIONSX",getElemsAsDict(getValueByColIntoList(altars,"Locations",alt)))
             # Finish line
